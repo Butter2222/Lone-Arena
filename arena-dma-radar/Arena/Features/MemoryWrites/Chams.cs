@@ -1,12 +1,12 @@
 ﻿using arena_dma_radar.Arena.GameWorld;
-using LoneShared.Common.Features;
-using LoneShared.Common.Misc;
-using LoneShared.Common.DMA.ScatterAPI;
-using LoneShared.Common.Unity;
-using LoneShared.Common.Unity.LowLevel;
+using eft_dma_shared.Common.Features;
+using eft_dma_shared.Common.Misc;
+using eft_dma_shared.Common.DMA.ScatterAPI;
+using eft_dma_shared.Common.Unity;
+using eft_dma_shared.Common.Unity.LowLevel;
 using arena_dma_radar.Arena.Features;
-using LoneShared.Common.Misc.Config;
-using LoneShared.Common.Misc.Commercial;
+using eft_dma_shared.Common.Misc.Config;
+using eft_dma_shared.Common.Misc.Commercial;
 
 namespace arena_dma_radar.Arena.Features.MemoryWrites
 {

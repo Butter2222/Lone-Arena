@@ -3,19 +3,19 @@ using arena_dma_radar.UI.Radar;
 using arena_dma_radar.UI.Misc;
 using arena_dma_radar.Arena.ArenaPlayer.Plugins;
 using arena_dma_radar.Arena.GameWorld;
-using LoneShared.Common.Features;
-using LoneShared.Common.Misc;
-using LoneShared.Common.DMA.ScatterAPI;
-using LoneShared.Common.Unity;
-using LoneShared.Common.Unity.Collections;
-using LoneShared.Common.Unity.LowLevel;
-using LoneShared.Common.Players;
-using LoneShared.Common.Maps;
+using eft_dma_shared.Common.Features;
+using eft_dma_shared.Common.Misc;
+using eft_dma_shared.Common.DMA.ScatterAPI;
+using eft_dma_shared.Common.Unity;
+using eft_dma_shared.Common.Unity.Collections;
+using eft_dma_shared.Common.Unity.LowLevel;
+using eft_dma_shared.Common.Players;
+using eft_dma_shared.Common.Maps;
 using arena_dma_radar.Arena.Features.MemoryWrites;
-using LoneShared.Common.ESP;
-using LoneShared.Common.Misc.Commercial;
-using LoneShared.Common.Misc.Pools;
-using LoneShared.Common.DMA;
+using eft_dma_shared.Common.ESP;
+using eft_dma_shared.Common.Misc.Commercial;
+using eft_dma_shared.Common.Misc.Pools;
+using eft_dma_shared.Common.DMA;
 
 namespace arena_dma_radar.Arena.ArenaPlayer
 {
@@ -90,26 +90,6 @@ namespace arena_dma_radar.Arena.ArenaPlayer
             Base = playerBase;
         }
 
-        /// <summary>
-        /// Starts the Post Allocation Task.
-        /// Call at the end of each derived constructor.
-        /// </summary>
-        protected void StartPostAllocationTask()
-        {
-            /// Run Async Task to finish up allocation after ctor completes
-            Task.Run(async () =>
-            {
-                if (IsHumanHostile) /// Twitch Check
-                {
-                    var twitchChannelURL = await TwitchService.LookupAsync(Name);
-                    if (twitchChannelURL is not null)
-                    {
-                        TwitchChannelURL = twitchChannelURL;
-                        Type = PlayerType.Streamer; // Flag Special Account Types
-                    }
-                }
-            }); /// Task End
-        }
         #endregion
 
         #region Fields / Properties

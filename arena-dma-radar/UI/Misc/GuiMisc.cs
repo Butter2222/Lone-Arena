@@ -1,9 +1,9 @@
 ﻿using arena_dma_radar.Arena.ArenaPlayer;
 using arena_dma_radar.UI.ESP;
 using arena_dma_radar.UI.Radar;
-using LoneShared.Common.Maps;
-using LoneShared.Common.Misc;
-using LoneShared.Common.Unity;
+using eft_dma_shared.Common.Maps;
+using eft_dma_shared.Common.Misc;
+using eft_dma_shared.Common.Unity;
 
 namespace arena_dma_radar.UI.Misc
 {

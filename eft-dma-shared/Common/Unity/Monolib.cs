@@ -1,8 +1,9 @@
-﻿using eft_dma_shared.Common.DMA.ScatterAPI;
-using eft_dma_shared.Common.DMA;
-using eft_dma_shared.Common.Misc.Commercial;
+﻿using eft_dma_shared.Common.DMA;
+using eft_dma_shared.Common.DMA.ScatterAPI;
 using eft_dma_shared.Common.Misc;
+using eft_dma_shared.Common.Misc.Commercial;
 using eft_dma_shared.Common.Unity.Collections;
+using System.Buffers.Binary;
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -99,7 +100,6 @@ namespace eft_dma_shared.Common.Unity
             FunctionsWorker.Reset();
         }
 
-
         #region Internal Functions
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace eft_dma_shared.Common.Unity
             if (byteCount < 2)
                 throw new ArgumentException("Input string is too short.", nameof(val));
 
-            return BitConverter.ToUInt16(utf16Bytes);
+            return BinaryPrimitives.ReadUInt16LittleEndian(utf16Bytes);
         }
 
         private static string ReadWidechar(ulong addr, int size)
@@ -170,7 +170,7 @@ namespace eft_dma_shared.Common.Unity
                 if (length % 2 != 0)
                     length++;
 
-                ArgumentOutOfRangeException.ThrowIfGreaterThan(length, 0x1000, nameof(length));
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(length, (int)MemDMABase.PAGE_SIZE, nameof(length));
                 Span<byte> buffer = stackalloc byte[length];
                 buffer.Clear();
                 Memory.ReadBuffer(addr, buffer);
@@ -255,7 +255,7 @@ namespace eft_dma_shared.Common.Unity
                 ulong[] results = new ulong[classNames.Length];
                 int foundCount = 0;
 
-                ulong monoImageSetPtrBase = Memory.MonoBase + 0x751980; // img_set_cache (MonoImageSet)
+                ulong monoImageSetPtrBase = Memory.MonoBase + 0x49A400; // img_set_cache (MonoImageSet)
 
                 using var monoImageSetPtrArray = MemArray<ulong>.Get(monoImageSetPtrBase, 1103);
                 using var mapOuter = ScatterReadMap.Get();
@@ -268,7 +268,7 @@ namespace eft_dma_shared.Common.Unity
                     ulong monoImageSetPtr = monoImageSetPtrArray[i];
                     if (monoImageSetPtr == 0x0)
                         continue;
-                    r1[i].AddEntry<MemPointer>(0, monoImageSetPtr + 0x28); // gclass_cache
+                    r1[i].AddEntry<MemPointer>(0, monoImageSetPtr + 0x28);
                     r1[i].Callbacks += x1 =>
                     {
                         if (foundCount == classNames.Length)
@@ -314,8 +314,8 @@ namespace eft_dma_shared.Common.Unity
                                                             if (x22.TryGetResult<MonoClass>(1, out var monoClass))
                                                             {
                                                                 if ((monoClass.Inited & 1) != 1 ||           // !class->inited
-                                                                    (monoClass.Flags & 0x100000) != 0 ||     // class->exception_type != MONO_EXCEPTION_NONE
-                                                                    (monoClass.ClassKind != 3))  // class->class_kind != MONO_CLASS_GINST
+                                                                    (monoClass.Flags & 0x800000) != 0 ||     // class->exception_type != MONO_EXCEPTION_NONE
+                                                                    (monoClass.Flags & 0x70000) != 0x30000)  // class->class_kind != MONO_CLASS_GINST
                                                                 {
                                                                     return;
                                                                 }
@@ -329,7 +329,6 @@ namespace eft_dma_shared.Common.Unity
                                                                         var vTable = monoClass.GetVTable(MonoRootDomain.Get());
                                                                         if (vTable == 0x0)
                                                                             return;
-
                                                                         ulong staticDataPtr = vTable.Value.GetStaticFieldData(vTable);
                                                                         if (staticDataPtr == 0x0)
                                                                             return;
@@ -368,12 +367,12 @@ namespace eft_dma_shared.Common.Unity
         [StructLayout(LayoutKind.Explicit, Pack = 1)]
         public readonly struct MonoRootDomain
         {
-            [FieldOffset(0x94)]
-            public readonly int DomainID; // domain_id
-            [FieldOffset(0xA0)]
-            public readonly ulong pDomainAssemblies; // domain_assemblies
-            [FieldOffset(0x120)]
-            public readonly ulong pJittedFunctionTable; // jit_info_table
+            [FieldOffset(0xBC)]
+            public readonly int DomainID;
+            [FieldOffset(0xC8)]
+            public readonly ulong pDomainAssemblies;
+            [FieldOffset(0x148)]
+            public readonly ulong pJittedFunctionTable;
 
             public readonly MonoValue<GList> GetDomainAssemblies() =>
                 MonoRead<GList>(pDomainAssemblies);
@@ -384,7 +383,7 @@ namespace eft_dma_shared.Common.Unity
                 {
                     var monoModule = Memory.MonoBase;
                     ArgumentOutOfRangeException.ThrowIfZero(monoModule, nameof(monoModule));
-                    return MonoRead<MonoRootDomain>(MonoReadPtr(monoModule + 0x751020));
+                    return MonoRead<MonoRootDomain>(MonoReadPtr(monoModule + 0x499c78));
                 }
                 catch
                 {
@@ -440,8 +439,8 @@ namespace eft_dma_shared.Common.Unity
 
             public readonly ulong GetStaticFieldData(MonoValue<MonoVTable> pThis)
             {
-                if ((this.Flags & 4) != 0)
-                    return MonoReadPtr(pThis + 0x48 + 8 * (uint)MonoRead<int>(p0 + 0x5C).Value);
+                if ((Flags & 4) != 0)
+                    return MonoReadPtr(pThis + 0x40 + 8 * (uint)MonoRead<int>(p0 + 0x5C).Value);
                 return 0x0;
             }
         }
@@ -449,8 +448,6 @@ namespace eft_dma_shared.Common.Unity
         [StructLayout(LayoutKind.Explicit, Pack = 1)]
         public readonly struct MonoClass
         {
-            [FieldOffset(0x1B)]
-            public readonly byte ClassKind; // class_kind
             [FieldOffset(0x20)]
             public readonly byte Inited;
             [FieldOffset(0x28)]
@@ -467,14 +464,12 @@ namespace eft_dma_shared.Common.Unity
             public readonly ulong pNamespaceName;
             [FieldOffset(0xD0)]
             public readonly ulong pRuntimeInfo;
-            [FieldOffset(0x98)]
-            public readonly ulong pFields;
-            [FieldOffset(0xA0)]
-            public readonly ulong pMethods;
-            [FieldOffset(0xB8)]
-            public readonly ulong Type;
             [FieldOffset(0x100)]
             public readonly int NumFields;
+            [FieldOffset(0xA0)]
+            public readonly ulong pMethods;
+            [FieldOffset(0x98)]
+            public readonly ulong pFields;
 
             public readonly bool IsSingleton => GetNamespaceName().Contains("Comfort.Common", StringComparison.OrdinalIgnoreCase) && GetName().Contains("Singleton", StringComparison.OrdinalIgnoreCase);
 
@@ -501,7 +496,7 @@ namespace eft_dma_shared.Common.Unity
 
             public readonly int GetNumMethods()
             {
-                var v2 = ClassKind - 1;
+                var v2 = (n1 & 7) - 1;
                 switch (v2)
                 {
                     case 0:
@@ -547,11 +542,11 @@ namespace eft_dma_shared.Common.Unity
             {
                 ulong monoPtr = 0x0;
 
-                int methodCount = this.GetNumMethods();
+                int methodCount = GetNumMethods();
                 ArgumentOutOfRangeException.ThrowIfGreaterThan(methodCount, 10000, nameof(methodCount));
                 for (int i = 0; i < methodCount; i++)
                 {
-                    var method = this.GetMethod(i);
+                    var method = GetMethod(i);
 
                     if (method == 0x0)
                         continue;
@@ -562,7 +557,7 @@ namespace eft_dma_shared.Common.Unity
 
                 if (!monoPtr.IsValidVirtualAddress())
                 {
-                    throw new InvalidOperationException($"'{methodName}' Function not found / Invalid address!");
+                    throw new InvalidOperationException("Function not found / Invalid address!");
                 }
                 return monoPtr;
             }
@@ -579,7 +574,7 @@ namespace eft_dma_shared.Common.Unity
                     }
                     else
                     {
-                        throw new InvalidOperationException($"'{methodName}' Function not jitted!");
+                        throw new InvalidOperationException("Function not jitted!");
                     }
                 }
                 catch
@@ -612,11 +607,11 @@ namespace eft_dma_shared.Common.Unity
 
             public readonly MonoClassField FindField(string field_name)
             {
-                int fieldCount = this.NumFields;
+                int fieldCount = NumFields;
                 ArgumentOutOfRangeException.ThrowIfGreaterThan(fieldCount, 10000, nameof(fieldCount));
                 for (int i = 0; i < fieldCount; i++)
                 {
-                    var pField = this.GetField(i);
+                    var pField = GetField(i);
                     if (pField == 0x0)
                         continue;
                     if (pField.Value.GetName() == field_name)
@@ -631,7 +626,7 @@ namespace eft_dma_shared.Common.Unity
 
             public ulong GetStaticFieldData()
             {
-                var vTable = this.GetVTable(MonoRootDomain.Get());
+                var vTable = GetVTable(MonoRootDomain.Get());
                 ArgumentOutOfRangeException.ThrowIfZero((ulong)vTable, nameof(vTable));
                 var staticFieldData = vTable.Value.GetStaticFieldData(vTable);
                 ArgumentOutOfRangeException.ThrowIfZero(staticFieldData, nameof(staticFieldData));
@@ -653,7 +648,7 @@ namespace eft_dma_shared.Common.Unity
                 bool findSubClass = className.Contains('+');
                 for (int i = 0; i < rowCount; i++)
                 {
-                    var ptr = MonoRead<MonoClass>(MonoRead<MonoHashTable>(monoImage + 0x4D0).Value.Lookup((ulong)(0x02000000 | i + 1)));
+                    var ptr = MonoRead<MonoClass>(MonoRead<MonoHashTable>(monoImage + 0x4C0).Value.Lookup((ulong)(0x02000000 | i + 1)));
                     if (ptr == 0x0)
                         continue;
                     var name = ptr.Value.GetName();
@@ -681,7 +676,7 @@ namespace eft_dma_shared.Common.Unity
                         return ptr.Value;
                     }
                 }
-                throw new Exception("Cannot find class " + className);
+                throw new InvalidOperationException();
             }
         }
 
@@ -699,11 +694,11 @@ namespace eft_dma_shared.Common.Unity
 
             public readonly ulong Lookup(ulong key)
             {
-                var v4 = MonoRead<MonoHashTable>(MonoReadPtr(pData + 0x8 * (ulong)((uint)key % this.Size)));
+                var v4 = MonoRead<MonoHashTable>(MonoReadPtr(pData + 0x8 * (ulong)((uint)key % Size)));
                 if (v4 == 0x0)
                     return default;
 
-                while ((ulong)v4.Value.KeyExtract != key)
+                while (v4.Value.KeyExtract != key)
                 {
                     v4 = MonoRead<MonoHashTable>(v4.Value.pNextValue);
                     if (v4 == 0x0)
@@ -722,18 +717,18 @@ namespace eft_dma_shared.Common.Unity
 
             public readonly MonoValue<MonoTableInfo> GetTableInfo(MonoValue<MonoImage> pThis, int tableID)
             {
-                if (tableID > 0x37)
+                if (tableID > 55)
                     return default;
-                return MonoRead<MonoTableInfo>(pThis + 0x10 * ((uint)tableID + 0xF));
+                return MonoRead<MonoTableInfo>(pThis + 0x10 * ((uint)tableID + 0xE));
             }
 
             public readonly MonoValue<MonoClass> Get(MonoValue<MonoImage> pThis, int typeID)
             {
-                if ((this.Flags & 0x20) != 0)
+                if ((Flags & 0x20) != 0)
                     return default;
                 if ((typeID & 0xFF000000) != 0x2000000)
                     return default;
-                return MonoRead<MonoClass>(MonoRead<MonoHashTable>(pThis + 0x4D0).Value.Lookup((ulong)typeID));
+                return MonoRead<MonoClass>(MonoRead<MonoHashTable>(pThis + 0x4C0).Value.Lookup((ulong)typeID));
             }
         }
 
@@ -836,10 +831,9 @@ namespace eft_dma_shared.Common.Unity
                     var rootDomain = MonoRootDomain.Get();
                     ArgumentOutOfRangeException.ThrowIfZero((ulong)rootDomain, nameof(rootDomain));
                     var pJittedTable = rootDomain.Value.pJittedFunctionTable;
-                    ArgumentOutOfRangeException.ThrowIfZero((ulong)pJittedTable, nameof(pJittedTable));
+                    ArgumentOutOfRangeException.ThrowIfZero(pJittedTable, nameof(pJittedTable));
                     int count1 = MonoRead<int>(pJittedTable + 0x8).Value;
-                    ArgumentOutOfRangeException.ThrowIfNegative(count1, nameof(count1));
-                    ArgumentOutOfRangeException.ThrowIfGreaterThan(count1, 30000, nameof(count1));
+                    ArgumentOutOfRangeException.ThrowIfGreaterThan(count1, 5000, nameof(count1));
 
                     ulong entryArrayBase = pJittedTable + 0x10;
                     using var entryArray = MemArray<ulong>.Get(entryArrayBase, count1);
@@ -849,7 +843,6 @@ namespace eft_dma_shared.Common.Unity
                         if (entry == 0x0)
                             continue;
                         int count2 = MonoRead<int>(entry + 0x4).Value;
-                        ArgumentOutOfRangeException.ThrowIfNegative(count2, nameof(count2));
                         ArgumentOutOfRangeException.ThrowIfGreaterThan(count2, 500, nameof(count2));
 
                         ulong functionArrayBase = entry + 0x18;

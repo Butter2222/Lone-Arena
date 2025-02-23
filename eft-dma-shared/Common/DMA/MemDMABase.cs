@@ -31,7 +31,7 @@ namespace eft_dma_shared.Common.DMA
         #region Init
 
         private const string _memoryMapFile = "mmap.txt";
-        public const uint MAX_READ_SIZE = (uint)0x1000 * 1500;
+        public const uint MAX_READ_SIZE = (uint)PAGE_SIZE * 1500;
         protected static readonly ManualResetEvent _syncProcessRunning = new(false);
         protected static readonly ManualResetEvent _syncInRaid = new(false);
         protected readonly Vmm _hVMM;
@@ -77,7 +77,6 @@ namespace eft_dma_shared.Common.DMA
             string versions = $"Vmm Version: {vmmVersion}\n" +
                 $"Leechcore Version: {lcVersion}";
             var initArgs = new string[] {
-                "-norefresh",
                 "-device",
                 fpgaAlgo is FpgaAlgo.Auto ?
                     "fpga" : $"fpga://algo={(int)fpgaAlgo}",
@@ -105,7 +104,7 @@ namespace eft_dma_shared.Common.DMA
                     }
                     _hVMM = new Vmm(initArgs);
                 }
-                SetCustomVMMRefresh();
+                SetCustomRefreshTimings();
                 MemoryInterface.Memory = this;
                 LoneLogging.WriteLine("DMA Initialized!");
             }
@@ -124,43 +123,18 @@ namespace eft_dma_shared.Common.DMA
             }
         }
 
-        #endregion
-
-        #region VMM Refresh
-
-        private readonly System.Timers.Timer _memCacheRefreshTimer = new(TimeSpan.FromMilliseconds(300));
-        private readonly System.Timers.Timer _tlbRefreshTimer = new(TimeSpan.FromSeconds(2));
-
         /// <summary>
-        /// Sets Custom VMM Refresh Timers. Be sure to FULL refresh when outside of a raid.
+        /// Sets the custom Refresh Timings as per the Vmm Config.
+        /// 1 Tick = 100ms.
         /// </summary>
-        private void SetCustomVMMRefresh()
+        /// <param name="vmm">Vmm Instance.</param>
+        private void SetCustomRefreshTimings()
         {
-            _memCacheRefreshTimer.Elapsed += memCacheRefreshTimer_Elapsed;
-            _tlbRefreshTimer.Elapsed += tlbRefreshTimer_Elapsed;
-            _memCacheRefreshTimer.Start();
-            _tlbRefreshTimer.Start();
-        }
-
-        private void memCacheRefreshTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            if (!_hVMM.SetConfig(Vmm.CONFIG_OPT_REFRESH_FREQ_MEM_PARTIAL, 1))
-                LoneLogging.WriteLine("WARNING: Vmm MEM CACHE Refresh (Partial) Failed!");
-        }
-
-        private void tlbRefreshTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            if (!_hVMM.SetConfig(Vmm.CONFIG_OPT_REFRESH_FREQ_TLB_PARTIAL, 1))
-                LoneLogging.WriteLine("WARNING: Vmm TLB Refresh (Partial) Failed!");
-        }
-
-        /// <summary>
-        /// Manually Force a Full Vmm Refresh.
-        /// </summary>
-        public void FullRefresh()
-        {
-            if (!_hVMM.SetConfig(Vmm.CONFIG_OPT_REFRESH_ALL, 1))
-                LoneLogging.WriteLine("WARNING: Vmm FULL Refresh Failed!");
+            if (!_hVMM.SetConfig(Vmm.CONFIG_OPT_CONFIG_PROCCACHE_TICKS_PARTIAL, 100) || // 50
+                !_hVMM.SetConfig(Vmm.CONFIG_OPT_CONFIG_PROCCACHE_TICKS_TOTAL, 1800) || // 150
+                !_hVMM.SetConfig(Vmm.CONFIG_OPT_CONFIG_READCACHE_TICKS, 4) || // 3
+                !_hVMM.SetConfig(Vmm.CONFIG_OPT_CONFIG_TLBCACHE_TICKS, 25)) // 20
+                throw new Exception("ERROR Setting Custom Vmm Timings!");
         }
 
         #endregion
@@ -263,7 +237,7 @@ namespace eft_dma_shared.Common.DMA
                 //loop all the pages we would need
                 for (int p = 0; p < numPages; p++)
                 {
-                    ulong page = basePage + 0x1000 * (uint)p;
+                    ulong page = basePage + PAGE_SIZE * (uint)p;
                     pagesToRead.Add(page);
                 }
             }
@@ -511,7 +485,7 @@ namespace eft_dma_shared.Common.DMA
         /// <exception cref="Exception"></exception>
         public string ReadString(ulong addr, int length, bool useCache = true) // read n bytes (string)
         {
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(length, (int)0x1000, nameof(length));
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(length, (int)PAGE_SIZE, nameof(length));
             Span<byte> buffer = stackalloc byte[length];
             buffer.Clear();
             ReadBuffer(addr, buffer, useCache, true);
@@ -529,7 +503,7 @@ namespace eft_dma_shared.Common.DMA
             if (length % 2 != 0)
                 length++;
             length *= 2; // Unicode 2 bytes per char
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(length, (int)0x1000, nameof(length));
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(length, (int)PAGE_SIZE, nameof(length));
             Span<byte> buffer = stackalloc byte[length];
             buffer.Clear();
             ReadBuffer(addr + 0x14, buffer, useCache, true);
@@ -770,16 +744,29 @@ namespace eft_dma_shared.Common.DMA
             return handle;
         }
 
+        /// <summary>
+        /// Force a Full Vmm Refresh.
+        /// </summary>
+        protected void FullRefresh()
+        {
+            if (!(_hVMM?.SetConfig(Vmm.CONFIG_OPT_REFRESH_ALL, 1) ?? false))
+                LoneLogging.WriteLine("WARNING: Vmm Refresh Failed!");
+        }
+
         #endregion
 
         #region Memory Macros
+
+        /// Mem Align Functions Ported from Win32 (C Macros)
+        public const ulong PAGE_SIZE = 0x1000;
+        public const int PAGE_SHIFT = 12;
 
         /// <summary>
         /// The PAGE_ALIGN macro takes a virtual address and returns a page-aligned
         /// virtual address for that page.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong PAGE_ALIGN(ulong va) => va & ~(0x1000ul - 1);
+        public static ulong PAGE_ALIGN(ulong va) => va & ~(PAGE_SIZE - 1);
 
         /// <summary>
         /// The ADDRESS_AND_SIZE_TO_SPAN_PAGES macro takes a virtual address and size and returns the number of pages spanned by
@@ -787,21 +774,20 @@ namespace eft_dma_shared.Common.DMA
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint ADDRESS_AND_SIZE_TO_SPAN_PAGES(ulong va, uint size) =>
-            (uint)(BYTE_OFFSET(va) + size + (0x1000ul - 1) >> (int)12);
+            (uint)(BYTE_OFFSET(va) + size + (PAGE_SIZE - 1) >> PAGE_SHIFT);
 
         /// <summary>
         /// The BYTE_OFFSET macro takes a virtual address and returns the byte offset
         /// of that address within the page.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint BYTE_OFFSET(ulong va) => (uint)(va & 0x1000ul - 1);
+        public static uint BYTE_OFFSET(ulong va) => (uint)(va & PAGE_SIZE - 1);
 
         /// <summary>
         /// Returns a length aligned to 8 bytes.
-        /// Always rounds up.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint AlignLength(uint length) => (length + 7) & ~7u;
+        public static uint GetAlignedLength(uint length) => length + 7 & ~7u;
 
         /// <summary>
         /// Returns an address aligned to 8 bytes.
@@ -813,10 +799,6 @@ namespace eft_dma_shared.Common.DMA
         #endregion
 
         #region NativeHook Interop
-        /// <summary>
-        /// Get the Code Cave Address for NativeHook.
-        /// </summary>
-        /// <exception cref="Exception"></exception>
         public virtual ulong GetCodeCave() => throw new NotImplementedException();
         #endregion
     }

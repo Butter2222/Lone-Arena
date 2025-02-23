@@ -1,9 +1,9 @@
 ﻿using arena_dma_radar.Arena.ArenaPlayer.Plugins;
 using arena_dma_radar.Arena.GameWorld;
-using LoneShared.Common.DMA.ScatterAPI;
-using LoneShared.Common.Misc.Commercial;
-using LoneShared.Common.Players;
-using LoneShared.Common.Unity;
+using eft_dma_shared.Common.DMA.ScatterAPI;
+using eft_dma_shared.Common.Misc.Commercial;
+using eft_dma_shared.Common.Players;
+using eft_dma_shared.Common.Unity;
 
 namespace arena_dma_radar.Arena.ArenaPlayer
 {
@@ -118,7 +118,6 @@ namespace arena_dma_radar.Arena.ArenaPlayer
                 Type = TeamID != -1 && TeamID == Memory.LocalPlayer.TeamID ?
                     PlayerType.Teammate : PlayerType.Player;
             }
-            StartPostAllocationTask();
         }
 
         /// <summary>

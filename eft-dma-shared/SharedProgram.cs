@@ -104,5 +104,18 @@ namespace eft_dma_shared
         /// </summary>
         private static void CurrentDomain_ProcessExit(object sender, EventArgs e) =>
             Config.Save();
+
+        /// <summary>
+        /// Shuts down the program. Executed via delayed callback.
+        /// </summary>
+        [System.Reflection.Obfuscation(Feature = "Virtualization", Exclude = false)]
+        public static void StartShutdownCallback(string message)
+        {
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3.5d));
+            cts.Token.Register(() =>
+            {
+                Environment.FailFast(message);
+            });
+        }
     }
 }

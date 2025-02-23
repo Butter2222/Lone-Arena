@@ -1,4 +1,4 @@
-﻿using LoneShared.Common.Misc;
+﻿using eft_dma_shared.Common.Misc;
 
 namespace arena_dma_radar.UI.Misc
 {

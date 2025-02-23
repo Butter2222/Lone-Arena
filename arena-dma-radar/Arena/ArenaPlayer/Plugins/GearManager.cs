@@ -1,5 +1,5 @@
-﻿using LoneShared.Common.Misc.Data;
-using LoneShared.Common.Unity.Collections;
+﻿using eft_dma_shared.Common.Misc.Data;
+using eft_dma_shared.Common.Unity.Collections;
 using System.Collections.Frozen;
 
 namespace arena_dma_radar.Arena.ArenaPlayer.Plugins
@@ -40,7 +40,7 @@ namespace arena_dma_radar.Arena.ArenaPlayer.Plugins
                     var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
                     var idPtr = Memory.ReadValue<Types.MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
                     string id = Memory.ReadUnityString(idPtr.StringID);
-                    if (LoneDataManager.AllItems.TryGetValue(id, out var entry))
+                    if (EftDataManager.AllItems.TryGetValue(id, out var entry))
                         gearDict.TryAdd(name, entry.Name);
                 }
                 catch { } // Skip over empty slots

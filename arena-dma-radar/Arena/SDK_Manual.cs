@@ -1,5 +1,5 @@
-﻿using LoneShared.Common.Unity;
-using LoneShared.Common.Unity.Collections;
+﻿using eft_dma_shared.Common.Unity;
+using eft_dma_shared.Common.Unity.Collections;
 
 namespace SDK // Custom Namespace for ease of coding
 {

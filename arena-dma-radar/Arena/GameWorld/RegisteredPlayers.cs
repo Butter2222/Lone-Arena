@@ -1,9 +1,9 @@
 ﻿using arena_dma_radar.Arena.ArenaPlayer;
-using LoneShared.Common.DMA.ScatterAPI;
-using LoneShared.Common.Unity.Collections;
+using eft_dma_shared.Common.DMA.ScatterAPI;
+using eft_dma_shared.Common.Unity.Collections;
 using arena_dma_radar.Arena.Features;
 using arena_dma_radar.Arena.Features.MemoryWrites;
-using LoneShared.Common.Misc.Commercial;
+using eft_dma_shared.Common.Misc.Commercial;
 
 namespace arena_dma_radar.Arena.GameWorld
 {

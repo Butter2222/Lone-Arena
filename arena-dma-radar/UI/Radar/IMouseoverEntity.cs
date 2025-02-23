@@ -1,5 +1,5 @@
 ﻿using arena_dma_radar.Arena.ArenaPlayer;
-using LoneShared.Common.Maps;
+using eft_dma_shared.Common.Maps;
 
 namespace arena_dma_radar.UI.Radar
 {

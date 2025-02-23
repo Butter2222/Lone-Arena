@@ -4,14 +4,17 @@
     {
         public readonly struct ModuleBase
         {
-            public const uint GameObjectManager = 0x1CF93E0; // to eft_dma_radar.GameObjectManager
-            public const uint AllCameras = 0x1BF8BC0; // Lookup in IDA 's_AllCamera'
-            public const uint InputManager = 0x1C91748;
-            public const uint GfxDevice = 0x1CF9F48; // g_MainGfxDevice , Type GfxDeviceClient
+            public const uint GameObjectManager = 0x17FFD28; // to eft_dma_radar.GameObjectManager
+            public const uint AllCameras = 0x179F500; // Lookup in IDA 's_AllCamera'
+            public const uint ManagerContext = 0x17FFAE0; // Lookup in IDA
+            public const uint InputManager = ManagerContext + 1 * 0x8; // ManagerContext[1]
+            public const uint GfxDevice = 0x1847810; // g_MainGfxDevice , Type GfxDeviceClient
         }
         public readonly struct UnityInputManager
         {
-            public const uint CurrentKeyState = 0x60; // 0x50 + 0x8
+            public const uint CurrentKeyState = 0x58; // 0x50 + 0x8
+            public const uint ThisFrameKeyDown = 0x78; // 0x70 + 0x8
+            public const uint ThisFrameKeyUp = 0x98; // 0x90 + 0x8
         }
         public readonly struct TransformInternal
         {
@@ -32,28 +35,30 @@
             public const uint Count = 0x158; // Extends from m_Materials type (0x20 length?)
         }
 
-        public readonly struct Camera
+        public readonly struct Camera // NOTE: Add previous struct size to get final offset
         {
-            // CopiableState struct begins at 0x40
-            public const uint ViewMatrix = 0x100;
-            public const uint FOV = 0x180;
-            public const uint AspectRatio = 0x4F0;
-            public const uint OcclusionCulling = 0x524; // bool, Camera::CopiableState -> m_OcclusionCulling
+            private const uint State = 0x40; // Camera::CopiableState (m_State)
+            public const uint ViewMatrix = State + 0x9C; // Matrix4x4 (m_WorldToClipMatrix)
+            public const uint FOV = State + 0x11C; // float (m_FieldOfView)
+            public const uint LastPosition = State + 0x3EC; // float (m_LastPosition)
+            public const uint NearClip = State + 0x3FC; // float (m_NearClip)
+            public const uint AspectRatio = State + 0x488; // float (m_Aspect)
+            public const uint OcclusionCulling = State + 0x4BC; // bool (m_OcclusionCulling)
         }
 
         public readonly struct GfxDeviceClient
         {
-            public const uint Viewport = 0x25A0; // m_Viewport      RectT<int> ?
+            public const uint Viewport = 0x2A28; // m_Viewport      RectT<int> ?
         }
 
         public readonly struct UnityAnimator // Animator        struc ; (sizeof=0x6A0, align=0x8, copyof_18870)
         {
-            public const uint Speed = 0x488; // 0000047C m_Speed
+            public const uint Speed = 0x47C; // 0000047C m_Speed
         }
 
         public readonly struct SSAA // Unity.Postprocessing.Runtime Assembly in UNISPECT
         {
-            public const uint OpticMaskMaterial = 0x60; // -.SSAA->_opticMaskMaterial // Offset: 0x0060 (Type: UnityEngine.Material)
+            public const uint OpticMaskMaterial = 0x58;
         }
     }
 }

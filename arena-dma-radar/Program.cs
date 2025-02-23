@@ -23,18 +23,18 @@ global using System.Net.Http.Headers;
 global using System.Buffers;
 global using System.Buffers.Binary;
 global using SDK;
-global using LoneShared;
-global using LoneShared.Misc;
-global using LoneShared.Common;
+global using eft_dma_shared;
+global using eft_dma_shared.Misc;
+global using eft_dma_shared.Common;
 using System.Runtime.Versioning;
 using arena_dma_radar;
 using arena_dma_radar.UI.Radar;
 using arena_dma_radar.UI.Misc;
 using arena_dma_radar.Arena;
 using arena_dma_radar.UI.ESP;
-using LoneShared.Common.Maps;
+using eft_dma_shared.Common.Maps;
 using arena_dma_radar.Arena.Features;
-using LoneShared.Common.Misc.Data;
+using eft_dma_shared.Common.Misc.Data;
 
 [assembly: AssemblyTitle(Program.Name)]
 [assembly: AssemblyProduct(Program.Name)]
@@ -75,7 +75,7 @@ namespace arena_dma_radar
         {
             ConfigPath.Create();
             var config = Config.Load();
-            LoneShared.SharedProgram.Initialize(ConfigPath, config);
+            eft_dma_shared.SharedProgram.Initialize(ConfigPath, config);
             Config = config;
         }
 
@@ -87,7 +87,7 @@ namespace arena_dma_radar
         private static void ConfigureProgram()
         {
             ApplicationConfiguration.Initialize();
-            LoneDataManager.ModuleInitAsync().GetAwaiter().GetResult();
+            EftDataManager.ModuleInitAsync().GetAwaiter().GetResult();
             LoneMapManager.ModuleInit();
             MemoryInterface.ModuleInit();
             FeatureManager.ModuleInit();

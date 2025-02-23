@@ -1,10 +1,10 @@
 ﻿using arena_dma_radar.Arena.ArenaPlayer;
 using arena_dma_radar.UI.SKWidgetControl;
-using LoneShared.Common.ESP;
-using LoneShared.Common.Misc;
-using LoneShared.Common.Misc.Commercial;
-using LoneShared.Common.Players;
-using LoneShared.Common.Unity;
+using eft_dma_shared.Common.ESP;
+using eft_dma_shared.Common.Misc;
+using eft_dma_shared.Common.Misc.Commercial;
+using eft_dma_shared.Common.Players;
+using eft_dma_shared.Common.Unity;
 
 namespace arena_dma_radar.UI.ESP
 {

@@ -1,10 +1,10 @@
 ﻿using arena_dma_radar.Arena.ArenaPlayer;
-using LoneShared.Common.DMA;
-using LoneShared.Common.DMA.ScatterAPI;
-using LoneShared.Common.Misc;
-using LoneShared.Common.Misc.Commercial;
-using LoneShared.Common.Unity;
-using LoneShared.Common.Unity.Collections;
+using eft_dma_shared.Common.DMA;
+using eft_dma_shared.Common.DMA.ScatterAPI;
+using eft_dma_shared.Common.Misc;
+using eft_dma_shared.Common.Misc.Commercial;
+using eft_dma_shared.Common.Unity;
+using eft_dma_shared.Common.Unity.Collections;
 
 namespace arena_dma_radar.Arena.GameWorld
 {

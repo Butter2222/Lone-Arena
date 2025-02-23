@@ -1,9 +1,9 @@
 ﻿using arena_dma_radar.Arena.ArenaPlayer.Plugins;
-using LoneShared.Common.DMA.ScatterAPI;
-using LoneShared.Common.DMA;
-using LoneShared.Common.Misc.Commercial;
-using LoneShared.Common.Players;
-using LoneShared.Common.Unity;
+using eft_dma_shared.Common.DMA.ScatterAPI;
+using eft_dma_shared.Common.DMA;
+using eft_dma_shared.Common.Misc.Commercial;
+using eft_dma_shared.Common.Players;
+using eft_dma_shared.Common.Unity;
 
 namespace arena_dma_radar.Arena.ArenaPlayer
 {

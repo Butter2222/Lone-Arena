@@ -2,12 +2,12 @@
 using arena_dma_radar.UI.ESP;
 using arena_dma_radar.UI.Radar;
 using arena_dma_radar.UI.Misc;
-using LoneShared.Common.Unity;
-using LoneShared.Common.Unity.Collections;
-using LoneShared.Common.Maps;
-using LoneShared.Common.Players;
-using LoneShared.Common.ESP;
-using LoneShared.Common.Misc.Commercial;
+using eft_dma_shared.Common.Unity;
+using eft_dma_shared.Common.Unity.Collections;
+using eft_dma_shared.Common.Maps;
+using eft_dma_shared.Common.Players;
+using eft_dma_shared.Common.ESP;
+using eft_dma_shared.Common.Misc.Commercial;
 
 namespace arena_dma_radar.Arena.GameWorld
 {

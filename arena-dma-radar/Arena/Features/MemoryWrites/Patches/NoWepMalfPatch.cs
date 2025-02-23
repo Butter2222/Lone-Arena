@@ -1,6 +1,6 @@
 ﻿using arena_dma_radar.Arena.Features;
-using LoneShared.Common.Features;
-using LoneShared.Common.Unity;
+using eft_dma_shared.Common.Features;
+using eft_dma_shared.Common.Unity;
 
 namespace arena_dma_radar.Arena.Features.MemoryWrites.Patches
 {

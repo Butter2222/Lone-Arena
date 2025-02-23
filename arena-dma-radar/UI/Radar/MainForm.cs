@@ -10,16 +10,16 @@ using arena_dma_radar.UI.Hotkeys;
 using arena_dma_radar.UI.Misc;
 using static arena_dma_radar.UI.Hotkeys.HotkeyManager;
 using static arena_dma_radar.UI.Hotkeys.HotkeyManager.HotkeyActionController;
-using LoneShared.Common.Features;
-using LoneShared.Common.Misc;
-using LoneShared.Common.Unity;
-using LoneShared.Common.Unity.LowLevel;
-using LoneShared.Common.Maps;
+using eft_dma_shared.Common.Features;
+using eft_dma_shared.Common.Misc;
+using eft_dma_shared.Common.Unity;
+using eft_dma_shared.Common.Unity.LowLevel;
+using eft_dma_shared.Common.Maps;
 using arena_dma_radar.Arena.Features;
 using arena_dma_radar.Arena.Features.MemoryWrites;
 using arena_dma_radar.Arena.Features.MemoryWrites.Patches;
-using LoneShared.Common.ESP;
-using LoneShared.Common.Misc.Commercial;
+using eft_dma_shared.Common.ESP;
+using eft_dma_shared.Common.Misc.Commercial;
 
 namespace arena_dma_radar.UI.Radar
 {

@@ -2,15 +2,15 @@
 using arena_dma_radar.Arena.ArenaPlayer.Plugins;
 using arena_dma_radar.Arena.GameWorld;
 using arena_dma_radar.UI.Misc;
-using LoneShared.Common.Features;
-using LoneShared.Common.Misc;
-using LoneShared.Common.Ballistics;
-using LoneShared.Common.Unity;
-using LoneShared.Common.Unity.Collections;
-using LoneShared.Common.DMA;
-using LoneShared.Common.ESP;
-using LoneShared.Common.Players;
-using LoneShared.Common.Misc.Commercial;
+using eft_dma_shared.Common.Features;
+using eft_dma_shared.Common.Misc;
+using eft_dma_shared.Common.Ballistics;
+using eft_dma_shared.Common.Unity;
+using eft_dma_shared.Common.Unity.Collections;
+using eft_dma_shared.Common.DMA;
+using eft_dma_shared.Common.ESP;
+using eft_dma_shared.Common.Players;
+using eft_dma_shared.Common.Misc.Commercial;
 
 namespace arena_dma_radar.Arena.Features.MemoryWrites
 {

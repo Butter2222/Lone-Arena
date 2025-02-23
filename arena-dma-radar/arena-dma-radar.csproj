@@ -61,7 +61,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\LoneShared\LoneShared.csproj" />
+	  <ProjectReference Include="..\eft-dma-shared\eft-dma-shared.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

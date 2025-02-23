@@ -1,13 +1,13 @@
 ﻿using arena_dma_radar.UI.ESP;
 using arena_dma_radar.UI.Misc;
-using LoneShared.Common.DMA.ScatterAPI;
-using LoneShared.Common.ESP;
-using LoneShared.Common.Misc;
-using LoneShared.Common.Misc.Commercial;
-using LoneShared.Common.Misc.Data;
-using LoneShared.Common.Misc.Pools;
-using LoneShared.Common.Unity;
-using LoneShared.Common.Unity.Collections;
+using eft_dma_shared.Common.DMA.ScatterAPI;
+using eft_dma_shared.Common.ESP;
+using eft_dma_shared.Common.Misc;
+using eft_dma_shared.Common.Misc.Commercial;
+using eft_dma_shared.Common.Misc.Data;
+using eft_dma_shared.Common.Misc.Pools;
+using eft_dma_shared.Common.Unity;
+using eft_dma_shared.Common.Unity.Collections;
 
 namespace arena_dma_radar.Arena.ArenaPlayer.Plugins
 {
@@ -168,7 +168,7 @@ namespace arena_dma_radar.Arena.ArenaPlayer.Plugins
             var idPtr = Memory.ReadValue<Types.MongoID>(itemTemp + Offsets.ItemTemplate._id);
             string id = Memory.ReadUnityString(idPtr.StringID);
             ArgumentOutOfRangeException.ThrowIfNotEqual(id.Length, 24, nameof(id));
-            if (!LoneDataManager.AllItems.TryGetValue(id, out var heldItem))
+            if (!EftDataManager.AllItems.TryGetValue(id, out var heldItem))
                 return new(handsController);
             return new(handsController, heldItem, itemBase);
         }
@@ -298,7 +298,7 @@ namespace arena_dma_radar.Arena.ArenaPlayer.Plugins
                         var bulletTemp = Memory.ReadPtr(bulletItem + Offsets.LootItem.Template);
                         var idPtr = Memory.ReadValue<Types.MongoID>(bulletTemp + Offsets.ItemTemplate._id);
                         string id = Memory.ReadUnityString(idPtr.StringID);
-                        if (LoneDataManager.AllItems.TryGetValue(id, out var bullet))
+                        if (EftDataManager.AllItems.TryGetValue(id, out var bullet))
                             return bullet?.ShortName;
                     }
                 }

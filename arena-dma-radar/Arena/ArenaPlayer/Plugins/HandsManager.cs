@@ -1,5 +1,5 @@
-﻿using LoneShared.Common.Misc.Data;
-using LoneShared.Common.Unity.Collections;
+﻿using eft_dma_shared.Common.Misc.Data;
+using eft_dma_shared.Common.Unity.Collections;
 
 namespace arena_dma_radar.Arena.ArenaPlayer.Plugins
 {
@@ -51,7 +51,7 @@ namespace arena_dma_radar.Arena.ArenaPlayer.Plugins
                     var itemTemplate = Memory.ReadPtr(itemBase + Offsets.LootItem.Template);
                     var itemIDPtr = Memory.ReadValue<Types.MongoID>(itemTemplate + Offsets.ItemTemplate._id);
                     var itemID = Memory.ReadUnityString(itemIDPtr.StringID);
-                    if (LoneDataManager.AllItems.TryGetValue(itemID, out var heldItem)) // Item exists in DB
+                    if (EftDataManager.AllItems.TryGetValue(itemID, out var heldItem)) // Item exists in DB
                         _cachedItem = heldItem;
                     _cached = itemBase;
                 }
@@ -65,7 +65,7 @@ namespace arena_dma_radar.Arena.ArenaPlayer.Plugins
                         var ammoTemplate = Memory.ReadPtr(slotItem + Offsets.LootItem.Template);
                         var idPtr = Memory.ReadValue<Types.MongoID>(ammoTemplate + Offsets.ItemTemplate._id);
                         string id = Memory.ReadUnityString(idPtr.StringID);
-                        if (LoneDataManager.AllItems.TryGetValue(id, out var ammo))
+                        if (EftDataManager.AllItems.TryGetValue(id, out var ammo))
                             _ammo = ammo?.ShortName;
                     }
                     catch { }

@@ -1,13 +1,13 @@
 ﻿using arena_dma_radar.UI.ColorPicker.ESP;
 using arena_dma_radar.UI.ColorPicker.Radar;
 using arena_dma_radar.UI.ESP;
-using LoneShared.Common.DMA;
-using LoneShared.Common.Unity;
-using LoneShared.Common.Unity.LowLevel;
+using eft_dma_shared.Common.DMA;
+using eft_dma_shared.Common.Unity;
+using eft_dma_shared.Common.Unity.LowLevel;
 using arena_dma_radar.Arena.Features.MemoryWrites;
-using LoneShared.Common.ESP;
-using LoneShared.Common.Players;
-using LoneShared.Common.Misc.Config;
+using eft_dma_shared.Common.ESP;
+using eft_dma_shared.Common.Players;
+using eft_dma_shared.Common.Misc.Config;
 
 namespace arena_dma_radar.UI.Misc
 {
@@ -290,9 +290,9 @@ namespace arena_dma_radar.UI.Misc
         public bool AdvancedMemWrites { get; set; } = false;
 
         /// <summary>
-        /// Enables the Experimental AntiPage Feature.
+        /// Enables the AntiPage Feature.
         /// </summary>
-        [JsonPropertyName("antiPageExperimentalRequiresAdvMemWrite")]
+        [JsonPropertyName("antiPageEnabled")]
         public bool AntiPage { get; set; } = false;
 
         /// <summary>
