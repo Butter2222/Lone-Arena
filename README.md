@@ -4,6 +4,3 @@
 
 ## Info
 - This is working as of 2/23/2025, but will not receive ongoing updates.
-  
-## Contact
-- For any inquiries or assistance, feel free to join the [EFT Educational Resources Discord Server](https://discord.gg/jGSnTCekdx). Please confine discussion to the [Lone DMA Section](https://discord.com/channels/1218731239599767632/1342207117704036382).
