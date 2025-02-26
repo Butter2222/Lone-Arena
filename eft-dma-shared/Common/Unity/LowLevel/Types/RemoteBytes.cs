@@ -13,14 +13,14 @@ namespace eft_dma_shared.Common.Unity.LowLevel.Types
 
         public RemoteBytes(int size)
         {
-            _size = MemDMABase.GetAlignedLength((uint)size);
+            _size = MemDMABase.AlignLength((uint)size);
             _pmem = NativeMethods.AllocBytes(_size);
             _pmem.ThrowIfInvalidVirtualAddress();
         }
 
         public RemoteBytes(IMonoType data)
         {
-            _size = MemDMABase.GetAlignedLength((uint)data.Data.Length);
+            _size = MemDMABase.AlignLength((uint)data.Data.Length);
             _pmem = NativeMethods.AllocBytes(_size);
             _pmem.ThrowIfInvalidVirtualAddress();
             WriteMonoValue(data);

@@ -189,7 +189,7 @@ namespace eft_dma_shared.Common.DMA.ScatterAPI
             uint pageOffset = MemDMABase.BYTE_OFFSET(Address); // Get object offset from the page start address
 
             var bytesCopied = 0; // track number of bytes copied to ensure nothing is missed
-            uint cb = Math.Min((uint)CB, (uint)MemDMABase.PAGE_SIZE - pageOffset); // bytes to read this page
+            uint cb = Math.Min((uint)CB, (uint)0x1000 - pageOffset); // bytes to read this page
 
             uint numPages =
                 MemDMABase.ADDRESS_AND_SIZE_TO_SPAN_PAGES(Address,
@@ -198,7 +198,7 @@ namespace eft_dma_shared.Common.DMA.ScatterAPI
 
             for (int p = 0; p < numPages; p++)
             {
-                ulong pageAddr = basePageAddr + MemDMABase.PAGE_SIZE * (uint)p; // get current page addr
+                ulong pageAddr = basePageAddr + 0x1000 * (uint)p; // get current page addr
                 if (hScatter.Results.TryGetValue(pageAddr, out var scatter)) // retrieve page of mem needed
                 {
                     scatter.Page
@@ -209,7 +209,7 @@ namespace eft_dma_shared.Common.DMA.ScatterAPI
                 else // read failed -> break
                     return false;
 
-                cb = (uint)MemDMABase.PAGE_SIZE; // set bytes to read next page
+                cb = 0x1000; // set bytes to read next page
                 if (bytesCopied + cb > CB) // partial chunk last page
                     cb = (uint)CB - (uint)bytesCopied;
 

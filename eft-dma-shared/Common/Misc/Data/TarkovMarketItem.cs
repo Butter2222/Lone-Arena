@@ -26,12 +26,17 @@ namespace eft_dma_shared.Common.Misc.Data
         [JsonPropertyName("shortName")]
         public string ShortName { get; init; } = "NULL";
         /// <summary>
-        /// Avg 24H Price or Trader Price whichever is higher.
-        /// Price adjusted for optimal flea market fee.
+        /// Highest Vendor Price.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("price")]
-        public int Price { get; init; }
+        public long TraderPrice { get; init; } = 0;
+        /// <summary>
+        /// Optimal Flea Market Price.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("fleaPrice")]
+        public long FleaPrice { get; init; } = 0;
         /// <summary>
         /// Number of slots taken up in the inventory.
         /// </summary>

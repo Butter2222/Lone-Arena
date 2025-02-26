@@ -289,6 +289,7 @@ namespace eft_dma_shared.Common.Players
         /// </summary>
         public enum TorsoBones : uint
         {
+            Neck = eft_dma_shared.Common.Unity.Bones.HumanNeck,
             UpperTorso = eft_dma_shared.Common.Unity.Bones.HumanSpine3,
             MidTorso = eft_dma_shared.Common.Unity.Bones.HumanSpine2,
             LowerTorso = eft_dma_shared.Common.Unity.Bones.HumanSpine1
